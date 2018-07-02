@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <% if(page != '/done'){ %>
+
+    <div class="container">
+      <fieldset>
+        <form action="/" method="post">
+          Project Name:  <br>
+          <input type="text" placeholder="project" name="projectName"><br> 
+          Subfolder: <br> 
+          <input type="text" placeholder="wireframes" name="subFolder"><br> 
+          Modifier? (Optional): <br> 
+          <input type="text" name="modifier"><br> 
+          <input type="submit"> 
+        </form>
+      </fieldset>
+    </div>
+    
+    <% if(page == '/upload'){ %>
+    <div class="container-fileupload">
+      <fieldset>
+        <form action="upload" method="post" enctype="multipart/form-data">
+          <input type="file" multiple="multiple" name="filetoupload"><br>
+          <input type="submit">
+        </form>
+      </fieldset>
+    </div>
+    <% } %>
+    <% } %>
+    <% if(page == '/done') { %>
+    <h1> DONE DONE </h1>
+    <% } %>
+
+  </body>
+</html>
+
