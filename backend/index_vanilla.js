@@ -16,7 +16,7 @@ var modifier = '';
 http.createServer(function (req, res) {
   
   if (req.url == '/fileupload') {
-    var filenames = []
+    var filenames = [];
     var form = new formidable.IncomingForm();
     form.keepExtensions = true;
     form.multiples = true;

@@ -1,83 +1,89 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
-var formidable = require('formidable')
+const expressForm = require('express-formidable');
 var fs = require('fs');
 var util = require('util');
 var mkdirp = require('mkdirp');
 var p = require('path');
 
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
-
-
-
 var projectName = 'project';
 var subFolder = 'wireframes';
 var modifier = '';
+
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
+app.use(expressForm({ 
+  uploadDir: '../tmp',
+  multiples: true, 
+  keepExtensions: true,
+  keepExtensions: true,
+}));
+
 
 app.get('/', function (req, res) {
   res.render('index', {page: req.url});
 })
 
-app.post('/', function (req, res) {
-  var form = new formidable.IncomingForm();
-  form.parse(req, function(err, fields) {
-    console.log('in here', fields)
-    if(fields.projectName) {
-      projectName = fields.projectName;
-    }
-    if(fields.subFolder) {
-      subFolder = fields.subFolder;
-    } 
-    if(fields.modifier){
-      modifier = fields.modifier;
-    }
-  });
-
-  form.on('end', function() {
-      createFileStructure();
-      res.end();
-      res.redirect('/upload');
-  })
+app.post('/info', function (req, res) {
+  console.log(req.fields);
+  if(req.fields.projectName) {
+    projectName = req.fields.projectName;
+  }
+  if(req.fields.subFolder) {
+    subFolder = req.fields.subFolder;
+  } 
+  if(req.fields.modifier){
+    modifier = req.fields.modifier;
+  }
+  createFileStructure(projectName, subFolder, modifier);
+  res.status(200).redirect('/upload');
 })
 
+
 app.get('/upload', function(req, res) {
-  console.log(req.url)
   res.render('index', {page: req.url});
 })
 
 app.post('/upload', function (req, res) {
+  req.files.filetoupload.forEach(function (file) {
+    var newpath = '../outputs/' + projectName + '/' + subFolder + '/' + modify(modifier) + 'images/' + file.name;
+    console.log(newpath, file.path);
+    fs.rename(file.path, newpath);
+    generateHTML(file.name);
+    writePathToFile(file.name);
+  })
+
   res.redirect('/done');
-  console.log('we hit upload! ', req.projectName);
 })
 
+
 app.get('/done', function (req, res) {
-  console.log('got done');
+  projectName = 'project';
+  subFolder = 'wireframes';
+  modifier = '';
   res.render('index', {page: req.url})
 })
 
-app.listen(3333, function() {
-  console.log('Listening on p:3333');
+var server = app.listen(process.env.PORT || 3333, function() {
+  console.log('Listening on' + server.address().port);
 })
+
+
+
+
+
 
 
 
 //////////////////////////////////
-
-
-function setArchiveName() {
-  res.attachment('archive-name.zip');
-
-}
 
 function modify() {
   return modifier ? modifier + '/' : '';
 }
 
 
-function createFileStructure() {
+function createFileStructure(projectName, subFolder, modifier) {
   console.log('Project Name: ' + projectName, 'Sub Folder: ' + subFolder); 
   mkdirp('../outputs/' + projectName + '/' + subFolder + '/' + modify() + 'images/', function(err) {
     if(err) console.error(err);
