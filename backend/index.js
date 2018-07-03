@@ -59,10 +59,19 @@ app.post('/upload', function (req, res) {
 
 
 app.get('/done', function (req, res) {
+  res.render('index', {page: req.url})
   projectName = 'project';
   subFolder = 'wireframes';
   modifier = '';
-  res.render('index', {page: req.url})
+})
+
+app.get('/outputs/:projectName/:subFolder/:name', function(req, res) {
+  var pn = req.params.projectName;
+  var sf = req.params.subFolder;
+  var n = req.params.name;
+  var path = '/outputs/' + pn + '/' + sf + '/' + n;
+  console.log(path);
+  res.sendFile(p.join(__dirname + path));
 })
 
 var server = app.listen(process.env.PORT || 3333, function() {
@@ -93,12 +102,13 @@ function createFileStructure(projectName, subFolder, modifier) {
 
 function generateHTML(name) {
   const NAME = name.substring(0, name.lastIndexOf('.'));
-  const path = './outputs/' + projectName + '/' + subFolder + '/' + modify() + 'images/' + name;
+  const path = '/outputs/' + projectName + '/' + subFolder + '/' + modify() + 'images/' + name;
+  const pp = p.join(__dirname + path)
   console.log(path);
   console.log(projectName);
   const htmlWRITE = NAME + '.html';
   const HTML = 
-  '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content=""><meta name="author" content=""><title>' + NAME + '</title></head><body class="overflow-hidden" style="background:#000;"><img width="100%" src="./' + 'images/' + name + '"></body></html>';
+  '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content=""><meta name="author" content=""><title>' + NAME + '</title></head><body class="overflow-hidden" style="background:#000;"><img width="100%" src=' + pp +'></body></html>';
 
   fs.writeFile("./outputs/" + projectName + "/" + subFolder + "/" + modify() + htmlWRITE, HTML, function(err) {
     if(err) {
